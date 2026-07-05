@@ -1,0 +1,18 @@
+# name: Main Pipeline for Orchestrate
+
+# on:
+#   push:
+#     branches:
+#       - main
+#   Workflow_dispatch:
+
+# jobs:
+#   verify:
+#     uses: ./.github/workflow/test_connection.yml
+#     permissions:
+#       id-token: write
+#       contents: read
+
+#   test_fleet_health_envs:
+#     needs: verify_connection
+#     uses: ./.github/workflows/feet       
