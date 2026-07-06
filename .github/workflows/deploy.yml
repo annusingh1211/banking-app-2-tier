@@ -1,12 +1,12 @@
-# name : Application Deploying On AWS
+name : Application Deploying On AWS
 
-# on:
-#    workflow_call:
+on:
+   workflow_call:
 
-# jobs:
-#   working-job:
-#     runs-on: ubuntu-latest
+jobs:
+  working-job:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name : Echo Message
-#         run : echo "Application Deployed On AWS successfully ✅"
+    steps:
+      - name : Echo Message
+        run : echo "Application Deployed On AWS successfully ✅"

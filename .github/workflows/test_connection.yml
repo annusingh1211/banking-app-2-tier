@@ -1,12 +1,12 @@
-# name : Test Connection For Pipelines
+name : Test Connection For Pipelines
 
-# on:
-#    workflow_call:
+on:
+   workflow_call:
 
-# jobs:
-#   working-job:
-#     runs-on: ubuntu-latest
+jobs:
+  working-job:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name : Echo Message
-#         run : echo "Github Action is working successfully ✅"
+    steps:
+      - name : Echo Message
+        run : echo "Github Action is working successfully ✅"

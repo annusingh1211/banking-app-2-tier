@@ -1,12 +1,12 @@
-# name : Smoke Testing For Infra and Networking
+name : Smoke Testing For Infra and Networking
 
-# on:
-#    workflow_call:
+on:
+   workflow_call:
 
-# jobs:
-#   working-job:
-#     runs-on: ubuntu-latest
+jobs:
+  working-job:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name : Echo Message
-#         run : echo "Smoke Testing For Infra and Networking Runs successfully ✅"
+    steps:
+      - name : Echo Message
+        run : echo "Smoke Testing For Infra and Networking Runs successfully ✅"
