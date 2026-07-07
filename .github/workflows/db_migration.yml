@@ -28,40 +28,38 @@ jobs:
           aws s3 cp init.py s3://540034108652-devops-scripts/init.py --region eu-north-1
           echo "✅ Files Uploaded to bucket.."
 
-      # - name: Initializing Database on RDS using Ec2
-      #   id: init
-      #   run: |
-      #     CMD_ID=$(aws ssm send-command \
-      #       --targets "Key=tag:App,Values=flask" \
-      #       --document-name "AWS-RunShellScript" \
-      #       --parameters '{"commands":[
-      #         "aws s3 cp s3://540034108652-devops-scripts/init.py /tmp/init.py",
-      #         "python3 /tmp/init.py || exit 1",
-      #         "rm /tmp/init.py"
-      #       ]}' \
-      #       --query 'Command.CommandId' \
-      #       --output text \
-      #       --region eu-north-1)
-      #     echo "cmd_id=$CMD_ID" >> $GITHUB_OUTPUT
+      - name: Initializing Database on RDS using Ec2
+        id: init
+        run: |
+          CMD_ID=$(aws ssm send-command \
+            --targets "Key=tag:App,Values=flask" \
+            --document-name "AWS-RunShellScript" \
+            --parameters '{"commands":[
+              "aws s3 cp s3://540034108652-devops-scripts/init.py /tmp/init.py",
+              "python3 /tmp/init.py || exit 1",
+              "rm /tmp/init.py"
+            ]}' \
+            --query 'Command.CommandId' \
+            --output text \
+            --region eu-north-1)
+          echo "cmd_id=$CMD_ID" >> $GITHUB_OUTPUT
 
-      # - name: Show Results
-      #   run: |
-      #     sleep 30
+      - name: Show Results
+        run: |
+          sleep 30
 
-      #     aws ssm list-command-invocations \
-      #       --command-id "${{ steps.init.outputs.cmd_id }}" \
-      #       --details \
-      #       --region eu-north-1 \
-      #       --output text
+          aws ssm list-command-invocations \
+            --command-id "${{ steps.init.outputs.cmd_id }}" \
+            --details \
+            --region eu-north-1 \
+            --output text
 
-      #     FAILED=$(aws ssm list-command-invocations \
-      #       --command-id "${{ steps.init.outputs.cmd_id }}" \
-      #       --query "length(CommandInvocations[?Status=='Failed'])" \
-      #       --output text \
-      #       --region eu-north-1)
+          FAILED=$(aws ssm list-command-invocations \
+            --command-id "${{ steps.init.outputs.cmd_id }}" \
+            --query "length(CommandInvocations[?Status=='Failed'])" \
+            --output text \
+            --region eu-north-1)
 
-      #     [ "$FAILED" -gt 0 ] && \
-      #       echo "::error::Database Creation Failed $FAILED instance(s)!" && \
-      #       exit 1
-
-      #     echo "✅ Database Created Successfully"
+          [ "$FAILED" -gt 0 ] && \
+            echo "::error::Database Creation Failed $FAILED instance(s)!" && \
+            exit 1
