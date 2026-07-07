@@ -18,3 +18,6 @@ CREATE TABLE IF NOT EXISTS accounts (
     balance DECIMAL(10, 2) DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- init.sql in this file- agar humko data base add krna ho to hum aad kr skte h, table add krna ho kr skte h
+-- yeh data base schema hota hai  (new table,colume add krna sub yhi se add hoga )
