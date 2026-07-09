@@ -9,7 +9,7 @@ permissions:
 
 env:
   VERSION: v1
-  REGION: us-east-1
+  REGION: eu-north-1
   ECR: 540034108652.dkr.ecr.eu-north-1.amazonaws.com
   IMAGE: 540034108652.dkr.ecr.eu-north-1.amazonaws.com/flask-app-simple-bank-new
   S3_BUCKET: s3://540034108652-devops-scripts
