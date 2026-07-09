@@ -1,15 +1,15 @@
-name: Deploy SimpleBank
+name: Deploy SimpleBank 
 
-on:
-  workflow_call:
+on: 
+ workflow_call: 
 
-permissions:
-  id-token: write
+permissions: 
+  id-token: write 
   contents: read
 
 env:
   VERSION: v1
-  REGION: eu-north-1
+  REGION: us-east-1
   ECR: 540034108652.dkr.ecr.eu-north-1.amazonaws.com
   IMAGE: 540034108652.dkr.ecr.eu-north-1.amazonaws.com/flask-app-simple-bank-new
   S3_BUCKET: s3://540034108652-devops-scripts
@@ -17,7 +17,6 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,7 +33,7 @@ jobs:
           aws ecr get-login-password --region ${{ env.REGION }} | \
           docker login --username AWS --password-stdin ${{ env.ECR }}
 
-      - name: Build and Push Image
+      - name: Build and push image
         run: |
           docker build -t ${{ env.IMAGE }}:${{ env.VERSION }} .
           docker push ${{ env.IMAGE }}:${{ env.VERSION }}
@@ -50,20 +49,18 @@ jobs:
             --targets "Key=tag:App,Values=flask" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy ${{ env.VERSION }} by ${{ github.actor }}" \
-            --parameters '{
-              "commands":[
-                "set -e",
-                "aws ecr get-login-password --region '${{ env.REGION }}' | docker login --username AWS --password-stdin '${{ env.ECR }}'",
-                "mkdir -p /home/ubuntu/app",
-                "aws s3 cp '${{ env.S3_BUCKET }}/docker-compose.yml' /home/ubuntu/app/docker-compose.yml",
-                "docker pull '${{ env.IMAGE }}:${{ env.VERSION }}'",
-                "docker stop simplebank 2>/dev/null || true",
-                "docker rm simplebank 2>/dev/null || true",
-                "cd /home/ubuntu/app && IMAGE_TAG='${{ env.VERSION }}' docker compose up -d",
-                "docker ps --filter name=simplebank --format \"{{.Status}}\" | grep -q Up && echo CONTAINER_RUNNING || (echo CONTAINER_FAILED && exit 1)"
-              ]
-            }' \
-            --query "Command.CommandId" \
+            --parameters '{"commands":[
+              "set -e",
+              "aws ecr get-login-password --region ${{ env.REGION }} | docker login --username AWS --password-stdin ${{ env.ECR }}",
+              "mkdir -p /home/ubuntu/app",
+              "aws s3 cp ${{ env.S3_BUCKET }}/docker-compose.yml /home/ubuntu/app/docker-compose.yml",
+              "docker pull ${{ env.IMAGE }}:${{ env.VERSION }}",
+              "docker stop simplebank 2>/dev/null || true",
+              "docker rm simplebank 2>/dev/null || true",
+              "cd /home/ubuntu/app && IMAGE_TAG=${{ env.VERSION }} docker compose up -d",
+              "docker ps --filter name=simplebank --format {{.Status}} | grep -q Up && echo CONTAINER_RUNNING || (echo CONTAINER_FAILED && exit 1)"
+            ]}' \
+            --query 'Command.CommandId' \
             --output text \
             --region ${{ env.REGION }})
 
@@ -79,12 +76,7 @@ jobs:
               --region ${{ env.REGION }})
 
             echo "[$i] Status: $STATUS"
-
-            if echo "$STATUS" | grep -qE "InProgress|Pending"; then
-              sleep 10
-            else
-              break
-            fi
+            echo "$STATUS" | grep -q "InProgress\|Pending" && sleep 10 || break
           done
 
           echo "============ DEPLOY RESULTS ============"
@@ -107,10 +99,8 @@ jobs:
             --output text \
             --region ${{ env.REGION }})
 
-          if [ "$FAILED" -gt 0 ]; then
-            echo "::error::Deploy failed on $FAILED instance(s)!"
+          [ "$FAILED" -gt 0 ] && \
+            echo "::error::Deploy failed on $FAILED instance(s)!" && \
             exit 1
-          fi
 
           echo "✅ Deploy successful — ${{ env.VERSION }}"
-          
