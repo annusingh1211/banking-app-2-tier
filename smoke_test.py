@@ -23,7 +23,7 @@ if missing:
     sys.exit(1)
 
 
-# DB FIND banking_db and show tables
+# DB FIND banking_db and show tables h
 try:
     connection=pymysql.connect(
         host=params["DB_HOST"],
