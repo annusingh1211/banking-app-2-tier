@@ -1,4 +1,48 @@
-      - name: Deploy via SSM
+name: Deploy SimpleBank 
+
+on: 
+ workflow_call: 
+
+permissions: 
+  id-token: write 
+  contents: read
+
+env:
+  VERSION: v1
+  REGION: eu-north-1
+  ECR: 540034108652.dkr.ecr.eu-north-1.amazonaws.com
+  IMAGE: 540034108652.dkr.ecr.eu-north-1.amazonaws.com/flask-app-simple-bank-new
+  S3_BUCKET: s3://540034108652-devops-scripts
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: annusingh1211/banking-app-2-tier
+          ref: main
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::540034108652:role/github-action-deploy-role-cicd-new
+          aws-region: ${{ env.REGION }}
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.REGION }} | \
+          docker login --username AWS --password-stdin ${{ env.ECR }}
+
+      - name: Build and push image
+        run: |
+          docker build -t ${{ env.IMAGE }}:${{ env.VERSION }} .
+          docker push ${{ env.IMAGE }}:${{ env.VERSION }}
+
+      - name: Upload docker-compose to S3
+        run: |
+          aws s3 cp docker-compose.yml ${{ env.S3_BUCKET }}/docker-compose.yml --region ${{ env.REGION }}
+
+           - name: Deploy via SSM
         id: deploy
         run: |
           CMD_ID=$(aws ssm send-command \
